@@ -1,121 +1,98 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+import "./App.css"
+import { nanoid } from "nanoid";
+import React, { Component } from "react";
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+class App extends Component {
+  state = {
+    contacts: [
+      { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
+      { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
+      { id: "id-3", name: "Eden Clements", number: "645-17-79" },
+      { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
+    ],
+    name: "",
+    number: "",
+    filter: "",
+  };
 
-      <div className="ticks"></div>
+  handleChange = (evt) => {
+    const { name, value } = evt.target;
+    this.setState({
+      [name]: value,
+    });
+  };
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+  handleSubmit = (evt) => {
+    evt.preventDefault();
+    const { name, number } = this.state;
+    if (this.state.name.trim() === "") return;
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    const newContact = {
+      id: nanoid(),
+      name: name,
+      number: number,
+    };
+
+    this.setState((prevState) => ({
+      contacts: [...prevState.contacts, newContact],
+      name: "",
+      number: "",
+      filter: "",
+    }));
+  };
+
+  render() {
+    const { contacts, name, number, filter } = this.state;
+    const filteredContacts = contacts.filter((item) => {
+      return item.name.toLowerCase().includes(filter.toLowerCase())
+    })
+    return (
+      <>
+        <h2>Phone Book</h2>
+        <form onSubmit={this.handleSubmit}>
+          <label>
+            Name
+            <input
+              onChange={this.handleChange}
+              type="text"
+              name="name"
+              value={name} // Тепер інпут контрольований
+              required
+            />
+          </label>
+          <label>
+            Numder
+            <input
+              onChange={this.handleChange}
+              type="tel"
+              name="number"
+              value={number}
+              title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+              required
+            />
+          </label>
+          <button type="submit">Add Contact</button>
+        </form>
+
+        <h2>Contacts</h2>
+        <p>Find contacts by name</p>
+        <input
+          onChange={this.handleChange}
+          type="text"
+          name="filter"
+          value={filter}
+        />
+        <ul>
+          {filteredContacts.map((item) => (
+            <li key={item.id}>
+              {item.name}: {item.number}
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+  }
 }
 
-export default App
+export default App;

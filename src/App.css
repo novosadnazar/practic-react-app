@@ -182,3 +182,12 @@
     border-right-color: var(--border);
   }
 }
+
+
+label{
+  display: block;
+}
+input{
+  display: block;
+  margin: 0 auto;
+}
