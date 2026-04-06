@@ -1,112 +1,8 @@
-
-// import "./App.css"
-// 
-// import React, { Component } from "react";
-
-// class App extends Component {
-//   state = {
-//     contacts: [
-//       { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
-//       { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
-//       { id: "id-3", name: "Eden Clements", number: "645-17-79" },
-//       { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
-//     ],
-//     name: "",
-//     number: "",
-//     filter: "",
-//   };
-
-//   handleChange = (evt) => {
-//     const { name, value } = evt.target;
-//     this.setState({
-//       [name]: value,
-//     });
-//   };
-
-//   handleSubmit = (evt) => {
-//     evt.preventDefault();
-//     const { name, number } = this.state;
-//     if (this.state.name.trim() === "") return;
-
-//     const newContact = {
-//       id: nanoid(),
-//       name: name,
-//       number: number,
-//     };
-
-//     this.setState((prevState) => ({
-//       contacts: [...prevState.contacts, newContact],
-//       name: "",
-//       number: "",
-//       filter: "",
-//     }));
-//   };
-
-//   render() {
-//     const { contacts, name, number, filter } = this.state;
-//     const filteredContacts = contacts.filter((item) => {
-//       return item.name.toLowerCase().includes(filter.toLowerCase())
-//     })
-//     return (
-//       <>
-//         <h2>Phone Book</h2>
-//         <form onSubmit={this.handleSubmit}>
-//           <label>
-//             Name
-//             <input
-//               onChange={this.handleChange}
-//               type="text"
-//               name="name"
-//               value={name} // Тепер інпут контрольований
-//               required
-//             />
-//           </label>
-//           <label>
-//             Numder
-//             <input
-//               onChange={this.handleChange}
-//               type="tel"
-//               name="number"
-//               value={number}
-//               title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-//               required
-//             />
-//           </label>
-//           <button type="submit">Add Contact</button>
-//         </form>
-
-//         <h2>Contacts</h2>
-//         <p>Find contacts by name</p>
-//         <input
-//           onChange={this.handleChange}
-//           type="text"
-//           name="filter"
-//           value={filter}
-//         />
-//         <ul>
-//           {filteredContacts.map((item) => (
-//             <li key={item.id}>
-//               {item.name}: {item.number}
-//             </li>
-//           ))}
-//         </ul>
-//       </>
-//     );
-//   }
-// }
-// //
-// export default App;
-
-
-
-
-import "./App.css"
-
-import React, { Component } from "react";
+import { Component } from "react";
 import { nanoid } from "nanoid";
-import { ContactForm } from "./components/ContactForm/ContactForm";
-import { ContactList } from "./components/ContactList/ContactList";
-import { Title } from "./components/Title/Title";
+import  ContactForm  from "./components/ContactForm/ContactForm";
+import Filter from "./components/Filter/Filter";
+import ContactList from "./components/ContactList/ContactList";
 
 class App extends Component {
   state = {
@@ -116,54 +12,79 @@ class App extends Component {
       { id: "id-3", name: "Eden Clements", number: "645-17-79" },
       { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
     ],
+    name: "",
+    number: "",
     filter: "",
   };
 
- 
-  handleFilterChange = (evt) => {
-    this.setState({ filter: evt.target.value });
-  };
 
+  handleSubmit = (evt) => {
+    evt.preventDefault();
 
-  addContact = (name, number) => {
-    const isExist = this.state.contacts.some(
+    const { name, number, contacts } = this.state;
+    const contactDublicate = contacts.some(
       (contact) => contact.name.toLowerCase() === name.toLowerCase()
     );
+    if (contactDublicate) {
+      alert(`${name} is already in contacts`);
+      this.setState({
+        name: "",
+        number: "",
+      });
+      return;
+    }
 
     const newContact = {
       id: nanoid(),
-      name,
-      number,
+      name: name,
+      number: number,
     };
 
     this.setState((prevState) => ({
       contacts: [...prevState.contacts, newContact],
+      name: "",
+      number: "",
+    }));
+  };
+
+  handleInput = (evt) => {
+    const { name, value } = evt.target;
+    this.setState({ [name]: value });
+  };
+
+  handleFilter = (evt) => {
+    this.setState({ filter: evt.target.value });
+  };
+
+  handleDelete = (id) => {
+    this.setState((prevState) => ({
+      contacts: prevState.contacts.filter((item) => item.id !== id),
     }));
   };
 
   render() {
-    const { contacts, filter } = this.state;
+    const normalizedFilter = this.state.filter.toLowerCase();
 
- 
-    const filteredContacts = contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(filter.toLowerCase())
+    const filteredContacts = this.state.contacts.filter((contact) =>
+      contact.name.toLowerCase().includes(normalizedFilter)
     );
 
     return (
-      <div>
-        <h1>Phonebook</h1>
-        <ContactForm onSubmit={this.addContact} />
-        <Title text="Contacts" />
-        <p>Find contacts by name</p>
-        <input
-          type="text"
-          name="filter"
-          value={filter}
-          onChange={this.handleFilterChange}
+      <>
+        <ContactForm
+          onSubmit={this.handleSubmit}
+          onChange={this.handleInput}
+          number={this.state.number}
+          name={this.state.name}
         />
-
-        <ContactList contacts={filteredContacts} />
-      </div>
+        <h2>Contacts</h2>
+        <h2>Find contaacts by name</h2>
+        <Filter value={this.state.filter} onChange={this.handleFilter} />
+        <ContactList
+          filteredContacts={filteredContacts}
+          onDelete={this.handleDelete}
+        />
+      </>
     );
   }
 }
