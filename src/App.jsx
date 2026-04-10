@@ -1,6 +1,9 @@
 import { Component } from "react";
 import { nanoid } from "nanoid";
-import  ContactForm  from "./components/ContactForm/ContactForm";
+import "./App.css";
+
+
+import ContactForm from "./components/ContactForm/ContactForm";
 import Filter from "./components/Filter/Filter";
 import ContactList from "./components/ContactList/ContactList";
 
@@ -12,32 +15,54 @@ class App extends Component {
       { id: "id-3", name: "Eden Clements", number: "645-17-79" },
       { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
     ],
+    filter: "",
     name: "",
     number: "",
-    filter: "",
   };
 
+  componentDidMount() {
+    const data = localStorage.getItem("contacts");
+    if (data) {
+      try {
+        this.setState({
+          contacts: JSON.parse(data),
+        });
+      } catch (error) {
+        console.error("Помилка парсингу localStorage:", error);
+      }
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
+    }
+  }
 
   handleSubmit = (evt) => {
-    evt.preventDefault();
+ 
+    if (evt.preventDefault) evt.preventDefault();
 
     const { name, number, contacts } = this.state;
-    const contactDublicate = contacts.some(
+
+    if (name.trim() === "" || number.trim() === "") {
+      alert("Будь ласка, заповніть усі поля");
+      return;
+    }
+
+    const isDuplicate = contacts.some(
       (contact) => contact.name.toLowerCase() === name.toLowerCase()
     );
-    if (contactDublicate) {
+
+    if (isDuplicate) {
       alert(`${name} is already in contacts`);
-      this.setState({
-        name: "",
-        number: "",
-      });
       return;
     }
 
     const newContact = {
       id: nanoid(),
-      name: name,
-      number: number,
+      name,
+      number,
     };
 
     this.setState((prevState) => ({
@@ -63,28 +88,30 @@ class App extends Component {
   };
 
   render() {
-    const normalizedFilter = this.state.filter.toLowerCase();
+    const { contacts, filter, name, number } = this.state;
+    const normalizedFilter = filter.toLowerCase();
 
-    const filteredContacts = this.state.contacts.filter((contact) =>
+    const filteredContacts = contacts.filter((contact) =>
       contact.name.toLowerCase().includes(normalizedFilter)
     );
 
     return (
-      <>
+      <div className="App">
+        <h1>Phonebook</h1>
         <ContactForm
           onSubmit={this.handleSubmit}
           onChange={this.handleInput}
-          number={this.state.number}
-          name={this.state.name}
+          number={number}
+          name={name}
         />
+
         <h2>Contacts</h2>
-        <h2>Find contaacts by name</h2>
-        <Filter value={this.state.filter} onChange={this.handleFilter} />
+        <Filter value={filter} onChange={this.handleFilter} />
         <ContactList
           filteredContacts={filteredContacts}
           onDelete={this.handleDelete}
         />
-      </>
+      </div>
     );
   }
 }
