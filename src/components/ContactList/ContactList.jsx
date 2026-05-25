@@ -1,19 +1,23 @@
-import React, { Component } from "react";
+import React from "react";
 
-export default class ContactList extends Component {
-  render() {
-    const { filteredContacts, onDelete } = this.props;
-    return (
-      <ul>
-        {filteredContacts.map(({ id, name, number }) => (
-          <li key={id}>
-            {name}:{number}
-            <button onClick={() => onDelete(id)} type="button">
-              delete
-            </button>
-          </li>
-        ))}
-      </ul>
-    );
-  }
-}
+const ContactList = ({ filteredContacts, onDelete }) => {
+  const handleDeleteClick = (evt) => {
+    const idToDelete = evt.currentTarget.getAttribute("data-id");
+    onDelete(idToDelete);
+  };
+
+  return (
+    <ul>
+      {filteredContacts.map(({ id, name, number }) => (
+        <li key={id}>
+          {name}: {number}
+          <button type="button" data-id={id} onClick={handleDeleteClick}>
+            delete
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default ContactList;

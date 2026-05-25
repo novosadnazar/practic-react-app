@@ -1,10 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 
-export default class Filter extends Component {
-  render() {
-    const { value, onChange } = this.props;
-    return (
-      <input type="text" name="filter" value={value} onChange={onChange} />
-    );
-  }
-}
+const Filter = ({ value, onChange }) => {
+  return <input type="text" name="filter" value={value} onChange={onChange} />;
+};
+
+export default Filter;
