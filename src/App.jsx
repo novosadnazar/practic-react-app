@@ -1,10 +1,15 @@
-import { useState, useEffect } from "react";
+
+
+import { useState, useEffect, createContext, useRef } from "react";
 import { nanoid } from "nanoid";
 import "./App.css";
 
 import ContactForm from "./components/ContactForm/ContactForm";
 import Filter from "./components/Filter/Filter";
 import ContactList from "./components/ContactList/ContactList";
+
+
+export const AppContext = createContext();
 
 const App = () => {
   const [contacts, setContacts] = useState(() => {
@@ -25,9 +30,19 @@ const App = () => {
   const [filter, setFilter] = useState("");
   const [form, setForm] = useState({ name: "", number: "" });
 
+
+  const nameInputRef = useRef(null);
+
   useEffect(() => {
     localStorage.setItem("contacts", JSON.stringify(contacts));
   }, [contacts]);
+
+
+  useEffect(() => {
+    if (nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, []);
 
   const handleSubmit = (evt) => {
     if (evt.preventDefault) evt.preventDefault();
@@ -43,6 +58,7 @@ const App = () => {
     );
 
     if (isDuplicate) {
+      alert(`${name} is already in contacts.`);
       return;
     }
 
@@ -54,6 +70,10 @@ const App = () => {
 
     setContacts((prevContacts) => [...prevContacts, newContact]);
     setForm({ name: "", number: "" });
+
+    if (nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
   };
 
   const handleInput = (evt) => {
@@ -77,22 +97,28 @@ const App = () => {
   );
 
   return (
-    <div className="App">
-      <h1>Phonebook</h1>
-      <ContactForm
-        onSubmit={handleSubmit}
-        onChange={handleInput}
-        number={form.number}
-        name={form.name}
-      />
+   
+    <AppContext.Provider
+      value={{
+        form,
+        filter,
+        filteredContacts,
+        nameInputRef, 
+        handleSubmit,
+        handleInput,
+        handleFilter,
+        handleDelete,
+      }}
+    >
+      <div className="App">
+        <h1>Phonebook</h1>
+        <ContactForm />
 
-      <h2>Contacts</h2>
-      <Filter value={filter} onChange={handleFilter} />
-      <ContactList
-        filteredContacts={filteredContacts}
-        onDelete={handleDelete}
-      />
-    </div>
+        <h2>Contacts</h2>
+        <Filter />
+        <ContactList />
+      </div>
+    </AppContext.Provider>
   );
 };
 

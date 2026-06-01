@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AppContext } from "../../App";
 
-const ContactList = ({ filteredContacts, onDelete }) => {
+const ContactList = () => {
+  const { filteredContacts, handleDelete } = useContext(AppContext);
+
   const handleDeleteClick = (evt) => {
     const idToDelete = evt.currentTarget.getAttribute("data-id");
-    onDelete(idToDelete);
+    handleDelete(idToDelete);
   };
 
   return (

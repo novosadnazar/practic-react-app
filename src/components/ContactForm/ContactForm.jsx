@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AppContext } from "../../App"; 
 
-const ContactForm = ({ onSubmit, onChange, number, name }) => {
+const ContactForm = () => {
+
+  const { form, handleInput, handleSubmit, nameInputRef } =
+    useContext(AppContext);
+
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={handleSubmit}>
       <label>
         Name:
         <input
-          onChange={onChange}
-          value={name}
+          ref={nameInputRef} 
+          onChange={handleInput}
+          value={form.name}
           type="text"
           name="name"
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
@@ -20,8 +26,8 @@ const ContactForm = ({ onSubmit, onChange, number, name }) => {
         <input
           type="tel"
           name="number"
-          onChange={onChange}
-          value={number}
+          onChange={handleInput}
+          value={form.number}
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
         />
